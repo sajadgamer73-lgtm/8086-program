@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8086 SILVER STUDIO | Sajad Mushtaq</title>
+<style>
+:root{
+--bg:#17191c;--panel:#22262b;--silver:#d9dee5;
+--light:#f1f3f5;--muted:#89919b;--line:#41474f;
+--dark:#101215;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--light);font-family:Tahoma,Arial}
+header{background:#252a30;border-bottom:1px solid var(--line);padding:20px 5%;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{background:linear-gradient(145deg,#fff,#929ba5);color:#17191c;padding:12px;font-weight:bold;font-size:21px}
+.brand h2{margin:0;font-size:16px;letter-spacing:2px}
+.brand small{color:#aab2bc;font-size:10px}
+.online{color:#d9dee5;font-size:11px}
+main{max-width:1450px;margin:auto;padding:25px 4%}
+.hero{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.hero h1{font-size:36px;margin:0;color:#fff}
+.hero h1 span{color:#aeb8c3}
+.hero p{color:var(--muted);font-size:12px}
+.tag{border:1px solid #727b85;color:#dce2e8;padding:9px 14px;font:12px monospace}
+.layout{display:grid;grid-template-columns:1.2fr 1fr;gap:15px}
+.panel{background:var(--panel);border:1px solid var(--line);padding:17px;border-radius:8px;min-width:0;box-shadow:0 8px 25px #0003}
+.panel-head{display:flex;justify-content:space-between;margin-bottom:15px;align-items:center}
+.panel-head h3{font-size:13px;margin:0;color:#e3e7ec}
+.panel-head small{color:#929ba5;font:11px monospace}
+.editor{width:100%;height:300px;background:#111418;color:#e3e9ef;border:1px solid #59616b;padding:17px;direction:ltr;text-align:left;font:14px/1.9 monospace;resize:vertical;outline:none}
+.editor:focus{border-color:#d4dce5}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button{border:1px solid #626b75;padding:10px 16px;border-radius:5px;cursor:pointer;font-weight:bold}
+.run{background:linear-gradient(135deg,#f5f6f8,#aab3bd);color:#17191c}
+.step{background:#4a525c;color:white}
+.stop{background:#333941;color:#eee}
+.reset{background:#242a31;color:#dce2e8}
+button:hover{filter:brightness(1.2)}
+.status{color:#d9e0e8;font-size:11px;margin-top:12px}
+.register-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.reg{background:#171a1e;border:1px solid #41474f;padding:13px 5px;text-align:center;border-radius:4px}
+.reg label{display:block;color:#929ba5;font:11px monospace}
+.reg strong{display:block;color:#e3e8ed;font:19px monospace;margin-top:8px}
+.subhead{color:#b9c2cc;font-size:11px;margin:19px 0 10px}
+.flags{display:flex;flex-wrap:wrap;gap:7px}
+.flag{background:#171a1e;border:1px solid #41474f;padding:9px 12px;font:11px monospace}
+.flag b{color:#fff}
+.info{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.info div{background:#171a1e;padding:12px;text-align:center;color:#929ba5;font-size:10px}
+.info b{display:block;color:#e0e5eb;font:16px monospace;margin-top:8px}
+.memory{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;direction:ltr}
+.cell{background:#171a1e;border:1px solid #41474f;text-align:center;padding:8px 2px;font:10px monospace;color:#e0e5eb}
+.cell small{display:block;color:#929ba5;margin-bottom:5px}
+.log{height:145px;overflow:auto;background:#111418;padding:13px;direction:ltr;text-align:left;font:11px/2 monospace;color:#d4dbe3}
+footer{text-align:center;color:#858d97;padding:25px;font-size:10px;letter-spacing:2px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}
+@media(max-width:450px){.register-grid{grid-template-columns:repeat(2,1fr)}.memory{grid-template-columns:repeat(4,1fr)}.hero h1{font-size:28px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">
+<div class="logo">86</div>
+<div><h2>SILVER STUDIO</h2><small>PROCESSOR SIMULATION LAB</small></div>
+</div>
+<div class="online">● SYSTEM READY</div>
+</header>
+<main>
+<div class="hero">
+<div>
+<h1>8086 <span>EMULATOR.</span></h1>
+<p>بيئة تعليمية تفاعلية لمحاكاة معالج Intel 8086.</p>
+</div>
+<div class="tag">INTEL ARCHITECTURE / 16-BIT</div>
+</div>
+<div class="layout">
+<section class="panel">
+<div class="panel-head"><h3>01 / ASSEMBLY EDITOR</h3><small>CODE TERMINAL</small></div>
+<textarea class="editor" id="code" spellcheck="false">MOV AX, 0005H
+MOV BX, 0003H
+ADD AX, BX
+MOV CX, AX
+INC CX
+SUB CX, 0001H
+HLT</textarea>
+<div class="toolbar">
+<button class="run" onclick="run()">▶ تشغيل</button>
+<button class="step" onclick="step()">↦ خطوة</button>
+<button class="stop" onclick="stop()">■ إيقاف</button>
+<button class="reset" onclick="reset()">↻ تصفير</button>
+</div>
+<div class="status" id="status">● READY TO EXECUTE</div>
+</section>
+<section class="panel">
+<div class="panel-head"><h3>02 / CPU REGISTERS</h3><small>16 BIT DATA</small></div>
+<div class="register-grid" id="registers"></div>
+<div class="subhead">SEGMENT REGISTERS</div>
+<div class="register-grid" id="segments"></div>
+<div class="subhead">FLAGS REGISTER</div>
+<div class="flags" id="flags"></div>
+</section>
+<section class="panel">
+<div class="panel-head"><h3>03 / EXECUTION MONITOR</h3><small>LIVE PROCESS</small></div>
+<div class="info">
+<div>INSTRUCTION POINTER<b id="ip">0000H</b></div>
+<div>EXECUTED<b id="count">0</b></div>
+<div>PROGRAM SIZE<b id="size">0</b></div>
+</div>
+<div class="subhead">CURRENT INSTRUCTION</div>
+<div class="log" id="current">Waiting for execution...</div>
+<div class="subhead">EXECUTION HISTORY</div>
+<div class="log" id="log"></div>
+</section>
+<section class="panel">
+<div class="panel-head"><h3>04 / MEMORY VIEW</h3><small>RAM MONITOR</small></div>
+<div class="memory" id="memory"></div>
+</section>
+</div>
+</main>
+<footer>DESIGNED & DEVELOPED BY SAJAD MUSHTAQ · 2026</footer>
+<script>
+let regs,seg,flags,mem,program,labels,pc,count,timer,halted;
+function fresh(){
+regs={AX:0,BX:0,CX:0,DX:0,SI:0,DI:0,BP:0,SP:65534};
+seg={CS:0,DS:0,SS:0,ES:0};
+flags={CF:0,ZF:0,SF:0,OF:0,PF:0,AF:0};
+mem=Array(32).fill(0);pc=0;count=0;program=[];labels={};halted=false;
+}
+function hex(n){return (n&65535).toString(16).toUpperCase().padStart(4,"0")+"H"}
+function message(s){document.getElementById("status").textContent="● "+s}
+function log(s){let e=document.getElementById("log");e.innerHTML+=s+"<br>";e.scrollTop=e.scrollHeight}
+function render(){
+document.getElementById("registers").innerHTML=Object.entries(regs).map(([k,v])=>`<div class="reg"><label>${k}</label><strong>${hex(v)}</strong></div>`).join("");
+document.getElementById("segments").innerHTML=Object.entries(seg).map(([k,v])=>`<div class="reg"><label>${k}</label><strong>${hex(v)}</strong></div>`).join("");
+document.getElementById("flags").innerHTML=Object.entries(flags).map(([k,v])=>`<div class="flag">${k} <b>${v}</b></div>`).join("");
+document.getElementById("memory").innerHTML=mem.map((v,i)=>`<div class="cell"><small>${hex(i*2)}</small>${hex(v)}</div>`).join("");
+document.getElementById("ip").textContent=hex(pc*2);
+document.getElementById("count").textContent=count;
+document.getElementById("size").textContent=program.length;
+}
+function parse(){
+program=[];labels={};
+document.getElementById("code").value.split("\n").forEach(line=>{
+let s=line.split(";")[0].trim().toUpperCase();if(!s)return;
+let m=s.match(/^([A-Z_]\w*):/);
+if(m){labels[m[1]]=program.length;s=s.slice(m[0].length).trim()}
+if(s)program.push(s);
+});
+}
+function val(x){
+x=x.trim().toUpperCase();
+if(x in regs)return regs[x];
+if(x in seg)return seg[x];
+if(/^[0-9A-F]+H$/.test(x))return parseInt(x.slice(0,-1),16);
+if(/^\d+$/.test(x))return Number(x);
+throw Error("Unknown value "+x);
+}
+function set(x,v){
+x=x.trim().toUpperCase();
+if(x in regs)regs[x]=v&65535;
+else if(x in seg)seg[x]=v&65535;
+else throw Error("Invalid destination "+x);
+}
+function update(v){
+v&=65535;flags.ZF=+(v===0);flags.SF=+(!!(v&32768));
+flags.PF=+((v&255).toString(2).replace(/0/g,"").length%2===0);
+}
+function execute(s){
+let [op,...rest]=s.split(/\s+/),a=rest.join("").split(",").map(x=>x.trim());
+let x,y,r;
+switch(op){
+case "MOV":set(a[0],val(a[1]));break;
+case "ADD":case "SUB":case "CMP":case "AND":case "OR":case "XOR":
+x=val(a[0]);y=val(a[1]);
+if(op==="ADD"){r=x+y;flags.CF=+(r>65535)}
+if(op==="SUB"||op==="CMP"){r=x-y;flags.CF=+(x<y)}
+if(op==="AND")r=x&y;if(op==="OR")r=x|y;if(op==="XOR")r=x^y;
+update(r);if(op!=="CMP")set(a[0],r);break;
+case "INC":case "DEC":
+r=val(a[0])+(op==="INC"?1:-1);update(r);set(a[0],r);break;
+case "JMP":case "JZ":case "JNZ":case "JC":case "JNC":
+let jump=op==="JMP"||(op==="JZ"&&flags.ZF)||(op==="JNZ"&&!flags.ZF)||(op==="JC"&&flags.CF)||(op==="JNC"&&!flags.CF);
+if(jump){if(!(a[0] in labels))throw Error("Label not found");pc=labels[a[0]];return}break;
+case "PUSH":regs.SP=(regs.SP-2)&65535;mem[(regs.SP>>1)%32]=val(a[0]);break;
+case "POP":set(a[0],mem[(regs.SP>>1)%32]);regs.SP=(regs.SP+2)&65535;break;
+case "NOP":break;
+case "HLT":halted=true;stop();message("EXECUTION COMPLETE");return;
+default:throw Error("Unsupported instruction "+op);
+}
+}
+function step(){
+if(halted)return;
+if(!program.length)parse();
+if(pc>=program.length){halted=true;stop();message("PROGRAM FINISHED");return}
+let line=program[pc];
+document.getElementById("current").textContent="IP "+hex(pc*2)+" > "+line;
+try{log(hex(pc*2)+" | "+line);pc++;execute(line);count++;render()}
+catch(e){halted=true;stop();log("ERROR: "+e.message);message("ERROR: "+e.message)}
+}
+function run(){
+if(halted)reset();
+if(!program.length)parse();
+if(timer)return;
+message("RUNNING...");
+timer=setInterval(()=>{step();if(halted)stop()},450);
+}
+function stop(){
+if(timer){clearInterval(timer);timer=null}
+if(!halted)message("EXECUTION PAUSED");
+}
+function reset(){
+stop();fresh();parse();
+document.getElementById("log").innerHTML="";
+document.getElementById("current").textContent="Waiting for execution...";
+message("SYSTEM RESET");render();
+}
+fresh();parse();render();
+</script>
+</body>
+</html>
