@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:">
 <title>8086 SILVER STUDIO | Sajad Mushtaq</title>
 <style>
 :root{
@@ -131,7 +132,8 @@ mem=Array(32).fill(0);pc=0;count=0;program=[];labels={};halted=false;
 }
 function hex(n){return (n&65535).toString(16).toUpperCase().padStart(4,"0")+"H"}
 function message(s){document.getElementById("status").textContent="● "+s}
-function log(s){let e=document.getElementById("log");e.innerHTML+=s+"<br>";e.scrollTop=e.scrollHeight}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function log(s,raw){let e=document.getElementById("log");e.innerHTML+=(raw?s:esc(s))+"<br>";e.scrollTop=e.scrollHeight}
 function render(){
 document.getElementById("registers").innerHTML=Object.entries(regs).map(([k,v])=>`<div class="reg"><label>${k}</label><strong>${hex(v)}</strong></div>`).join("");
 document.getElementById("segments").innerHTML=Object.entries(seg).map(([k,v])=>`<div class="reg"><label>${k}</label><strong>${hex(v)}</strong></div>`).join("");
@@ -144,7 +146,10 @@ document.getElementById("size").textContent=program.length;
 function parse(){
 program=[];labels={};
 document.getElementById("code").value.split("\n").forEach(line=>{
-let s=line.split(";")[0].trim().toUpperCase();if(!s)return;
+let t=line.trim();if(!t)return;
+if(t.startsWith("##")){program.push("\u0000"+t.slice(2));return;}
+if(t.startsWith("#"))return;
+let s=t.split(";")[0].trim().toUpperCase();if(!s)return;
 let m=s.match(/^([A-Z_]\w*):/);
 if(m){labels[m[1]]=program.length;s=s.slice(m[0].length).trim()}
 if(s)program.push(s);
@@ -196,6 +201,9 @@ if(halted)return;
 if(!program.length)parse();
 if(pc>=program.length){halted=true;stop();message("PROGRAM FINISHED");return}
 let line=program[pc];
+if(line.startsWith("\u0000")){
+document.getElementById("current").textContent="comment";
+log(line.slice(1),true);pc++;count++;render();return;}
 document.getElementById("current").textContent="IP "+hex(pc*2)+" > "+line;
 try{log(hex(pc*2)+" | "+line);pc++;execute(line);count++;render()}
 catch(e){halted=true;stop();log("ERROR: "+e.message);message("ERROR: "+e.message)}
